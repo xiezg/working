@@ -1,0 +1,3 @@
+GET https://kyfw.12306.cn/otn/passcodeNew/getPassCodeNew?module=login&rand=sjrand&0.7686594617513198 HTTP/1.1
+
+https://kyfw.12306.cn/otn/passcodeNew/getPassCodeNew?module=login&rand=sjrand
