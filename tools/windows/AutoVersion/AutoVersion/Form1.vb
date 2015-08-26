@@ -5,42 +5,46 @@ Imports Microsoft.VisualStudio.VCProjectEngine
 Imports EnvDTE80
 Imports EnvDTE
 
-
 Public Class Form1
 
     Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
 
-        ' Visual Basic
-        ' Get the Solution Name and path from the New Project dialog
-        Dim solutionName As String = "hehe"
-        Dim projectPath As String = "D:\123"
         ' Get the main automation object for Visual Studio
-        Dim dte As EnvDTE.DTE
+        Dim dte As EnvDTE.DTE = CType(Microsoft.VisualBasic.Interaction.CreateObject("VisualStudio.DTE.8.0"), EnvDTE.DTE)
 
-        dte = CType(Microsoft.VisualBasic.Interaction.CreateObject("VisualStudio.DTE.8.0"), EnvDTE.DTE)
         ' Get a solution object representing the default solution of Visual Studio and save the solution.
         Dim soln As EnvDTE80.Solution2 = CType(dte.Solution, EnvDTE80.Solution2)
-        If Not System.IO.Directory.Exists(projectPath) Then
-            System.IO.Directory.CreateDirectory(projectPath)
-        End If
 
-        soln.Open("C:\Users\xiezg\Desktop\123\123.sln")
+        soln.Open("C:\Users\Xiezg\Desktop\lala\lala.sln")
 
         Dim prjs As Projects = soln.Projects
-        Dim prj As Project
+        Dim prj As Project = prjs.Item(1)
 
-        Dim msg As String = ""
+        MsgBox(prj.Kind)
 
-        ' Go through all of the projects in the solution and display
-        ' their names and types.
-        prjs = dte.Solution.Projects
-        For Each prj In prjs
-            msg += "NAME: " & prj.Name & " TYPE: " & prj.Kind & vbCr
-        Next
-        MsgBox(msg)
+        prj = prjs.Item(2)
+        MsgBox(prj.Kind)
+
+        prj.Delete()
+
+        'MsgBox(prj.ExtenderCATID())
+        'MsgBox(prj.FullName)
+        'MsgBox(prj.Name)
 
 
-        soln.SaveAs(projectPath + ".sln")
+        soln.Close()
+
+    End Sub
+
+    Private Sub Button2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button2.Click
+
+        Dim Engine As VCProjectEngine
+        Dim Proj As VCProject
+
+        Engine = New VCProjectEngineObject()
+        Proj = Engine.LoadProject("C:\Users\Xiezg\Desktop\lala\lala\lala.vcproj")
+
+
 
     End Sub
 End Class
