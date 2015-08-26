@@ -96,6 +96,9 @@ void CheckRcFile( const char * rootPath, void (*lfn)( const std::string & ) )
 			continue;
 		}
 
+		if( stricmp( data.cFileName + strlen(data.cFileName) - 2, "rc" ) != 0 )		//根据文件扩展名来识别
+			continue;
+
 		std::string filePath = rootPath;
 
 		if( filePath.at( filePath.size() -1 ) != '\\' )

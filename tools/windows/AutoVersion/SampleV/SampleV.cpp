@@ -29,6 +29,12 @@ std::string findAndReSetVersionSection( std::string & fileContent, const std::st
 
 	size_t nPosBegin = -1;
 
+	//∏Ò Ω
+	//**************************
+	//"secName", oldValue
+	//"secName", "newVale"
+	//*************************
+
 	std::string secNameEx = "\"" + secName + "\"";
 
 	if( ( nPosBegin = fileContent.find( secNameEx, nPosWithVersionSection ) ) == std::string::npos )
@@ -97,7 +103,7 @@ void Update( const std::string & fileName )
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	CheckRcFile( "C:\\Users\\Xiezg\\Desktop\\rc_test", &Update );
+	CheckRcFile( "C:\\Users\\Xiezg\\Desktop", &Update );
 
 	return 0;
 }
