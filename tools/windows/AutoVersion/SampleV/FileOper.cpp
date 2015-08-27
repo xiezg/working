@@ -1,5 +1,9 @@
 #include "stdafx.h"
 
+#include "ToolBox.h"
+#include <shlobj.h>
+
+#pragma comment( lib, "shell32.lib" )
 
 int WriteFileFromMsg( const char * fileName, const std::string & content )
 {
@@ -112,4 +116,22 @@ void CheckRcFile( const char * rootPath, void (*lfn)( const std::string & ) )
 	} while ( FindNextFile( hFile, &data ) );
 
 	FindClose( hFile );
+}
+
+void BackupFile( const std::string & fileSrc, const std::string & backup_dir )
+{
+	std::string newFilePath = fileSrc;
+
+	newFilePath.replace( 
+		0, 
+		newFilePath.find_first_of( '\\'), 
+		backup_dir.substr( 0, backup_dir.at( backup_dir.size() - 1 ) == '\\' ? backup_dir.size() - 1 : std::string::npos ) );
+
+	std::wstring newFilePathUnicode;
+
+	MultiByteToWideChar( CP_ACP, 0, newFilePath, newFilePathUnicode );
+
+	SHCreateDirectory( NULL, newFilePathUnicode.substr( 0 , newFilePathUnicode.rfind( L'\\' ) ).c_str() );
+
+	CopyFile( fileSrc.c_str(), newFilePath.c_str(), FALSE );
 }
