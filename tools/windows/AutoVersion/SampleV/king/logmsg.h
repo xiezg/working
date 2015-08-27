@@ -6,8 +6,10 @@
 #include <time.h>
 #include <tchar.h>
 #include <yvals.h >
-#include <king\Lock.h>
+#include <direct.h>
 #include <stdio.h>
+
+#include ".\Lock.h"
 
 #include <Windows.h>
 #include <Shlwapi.h>

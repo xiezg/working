@@ -2,6 +2,7 @@
 
 #include "ToolBox.h"
 #include <shlobj.h>
+#include "king/logmsg.h"
 
 #pragma comment( lib, "shell32.lib" )
 
@@ -11,7 +12,7 @@ int WriteFileFromMsg( const char * fileName, const std::string & content )
 
 	if( hFile == INVALID_HANDLE_VALUE )
 	{
-		printf( "create file:%s fails.\r\n", fileName );
+		PRINT_DEBUG_MSG( "create file:%s fails.", fileName );
 		return -1;
 	}
 
@@ -19,7 +20,7 @@ int WriteFileFromMsg( const char * fileName, const std::string & content )
 
 	if( ! WriteFile( hFile, content.data(), (DWORD)content.size(), &dwWriteNum, NULL ) )
 	{
-		printf( "write file fails.\r\n" );
+		PRINT_DEBUG_MSG( "write file fails." );
 	}
 
 	CloseHandle(  hFile);
@@ -35,7 +36,7 @@ int MapFile( const char * fileName, std::string & fileContent )
 
 	if( hFile == INVALID_HANDLE_VALUE )
 	{
-		printf( "open file fails\r\n" );
+		PRINT_DEBUG_MSG( "open file fails." );
 		return -1;
 	}
 
@@ -71,6 +72,9 @@ ERR_EXIT:
 
 static int nCount = 0;
 
+#define DISCARD_FILE( fileName )\
+	if( _stricmp( data.cFileName, (fileName) ) == 0 ){PRINT_DEBUG_MSG( "特殊文件[%s]，忽略", (fileName) );continue;}
+
 void CheckRcFile( const char * rootPath, void (*lfn)( const std::string & ) )
 {
 	std::string searchPath = rootPath;
@@ -100,7 +104,22 @@ void CheckRcFile( const char * rootPath, void (*lfn)( const std::string & ) )
 			continue;
 		}
 
-		if( stricmp( data.cFileName + strlen(data.cFileName) - 2, "rc" ) != 0 )		//根据文件扩展名来识别
+		DISCARD_FILE( "zlib.rc" );
+		DISCARD_FILE( "afxctl.rc" );
+		DISCARD_FILE( "afxdb.rc" );
+		DISCARD_FILE( "afxisapi.rc" );
+		DISCARD_FILE( "afxolecl.rc" );
+		DISCARD_FILE( "afxolesv.rc" );
+		DISCARD_FILE( "afxprint.rc" );
+		DISCARD_FILE( "afxres.rc" );
+		DISCARD_FILE( "all.rc" );
+		DISCARD_FILE( "app.rc" );
+		DISCARD_FILE( "atl.rc" );
+		DISCARD_FILE( "atlres.rc" );
+		DISCARD_FILE( "atlsrv.rc" );
+
+
+		if( _stricmp( data.cFileName + strlen(data.cFileName) - 2, "rc" ) != 0 )		//根据文件扩展名来识别
 			continue;
 
 		std::string filePath = rootPath;

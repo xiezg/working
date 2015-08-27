@@ -3,6 +3,8 @@
 
 #include "stdafx.h"
 
+#include "king/logmsg.h"
+
 #include <iostream>
 #include <fstream>
 
@@ -15,12 +17,17 @@ extern void BackupFile( const std::string & fileSrc, const std::string & backup_
 
 #define PRE_FIND_VER_SEC( FILE_CONTENT, ERR_RETVAL )\
 	if( nPosWithVersionSection == std::string::npos && ( nPosWithVersionSection = findRcVersionSection( (FILE_CONTENT) ) ) == std::string::npos )\
-	{printf( "未找到[VS_VERSION_INFO VERSIONINFO]节\r\n" );return (ERR_RETVAL);}
+	{PRINT_DEBUG_MSG( "未找到[VS_VERSION_INFO VERSIONINFO]节." );return (ERR_RETVAL);}
 
 size_t nPosWithVersionSection = std::string::npos;
 
 std::string g_SearchPath;
 std::string g_BackupPath;
+
+std::string g_VersionNum = "1.0.0.1";
+std::string g_ProductNum = "1.0.0.1";
+
+HANDLE g_hLogFile = NULL;
 
 size_t findRcVersionSection( const std::string & fileContent )
 {
@@ -37,7 +44,7 @@ std::string findAndReSetVersionSection( std::string & fileContent, const std::st
 
 	if( ( nPosBegin = fileContent.find( secNameEx, nPosWithVersionSection ) ) == std::string::npos )
 	{
-		printf( "未找到VersionSection\r\n" );
+		PRINT_DEBUG_MSG( "未找到VersionSection." );
 		return "";
 	}
 
@@ -47,7 +54,7 @@ std::string findAndReSetVersionSection( std::string & fileContent, const std::st
 
 	if( nPOsEndLineBacklash == std::string::npos && nPosEndLineNewLine == std::string::npos )
 	{
-		printf( "错误的格式：行结束定界符[\\,\\r\\n]未找到\r\n" );
+		PRINT_DEBUG_MSG( "错误的格式：行结束定界符[\\,\\r\\n]未找到." );
 		return "";
 	}
 
@@ -62,7 +69,7 @@ std::string findAndReSetVersionSection( std::string & fileContent, const std::st
 
 	if( nPosBegin >= nEndLine )	//查找到的数值超出了本行的范围
 	{
-		printf( "未检测到定界符[,]，不支持的替换[%s]\r\n", fileContent.substr( nPosBeginTmp, nEndLine - nPosBeginTmp ).c_str() );
+		PRINT_DEBUG_MSG( "未检测到定界符[,]，不支持的替换[%s].", fileContent.substr( nPosBeginTmp, nEndLine - nPosBeginTmp ).c_str() );
 
 		return "";
 	}
@@ -87,29 +94,38 @@ std::string findAndReSetProductVersion( std::string & fileContent, const std::st
 	return findAndReSetVersionSection( fileContent, "ProductVersion", fileNewVersion );
 }
 
+std::string rcFileList;
+
 void Update( const std::string & fileName )
 {
-	printf( "begin process -------[ %s ]\r\n", fileName.c_str() );
+	PRINT_DEBUG_MSG( "begin process -------[ %s ].", fileName.c_str() );
 
 	std::string rcFileContent;
 
 	MapFile( fileName.c_str(), rcFileContent );
 
-	std::string oldValue = findAndReSetFileVersion( rcFileContent, "-.-.-.-" );
-	printf( "[%s] [%s]\r\n", fileName.c_str(), oldValue.c_str() );
-	
-	oldValue = findAndReSetProductVersion( rcFileContent, "0.0.0.0" );
+	std::string oldValue = findAndReSetFileVersion( rcFileContent, g_VersionNum );
+	PRINT_DEBUG_MSG( "[%s] [%s].", fileName.c_str(), oldValue.c_str() );
+
+	oldValue = findAndReSetProductVersion( rcFileContent, g_ProductNum );
 
 	BackupFile( fileName, g_BackupPath );
 	WriteFileFromMsg( fileName.c_str(), rcFileContent );
 
-	printf( "end process -------[ %s ]\r\n", fileName.c_str() );
+	PRINT_DEBUG_MSG( "end process -------[ %s ].", fileName.c_str() );
 }
 
 int _tmain(int argc, _TCHAR* argv[])
 {
 	g_SearchPath = argv[1];
 	g_BackupPath = argv[2];
+
+	g_VersionNum = argv[3];
+	g_ProductNum = argv[4];
+
+	g_hLogFile = OpenLogFile( NULL );
+
+	PRINT_DEBUG_MSG( "SearchPath:[%s].", g_SearchPath.c_str() );
 
 	CheckRcFile( g_SearchPath.c_str(), &Update );
 
