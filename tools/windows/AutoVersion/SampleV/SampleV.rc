@@ -74,7 +74,7 @@ BEGIN
             VALUE "InternalName", "SampleV"
             VALUE "LegalCopyright", "Copyright (C) 2015"
             VALUE "OriginalFilename", "SampleV.exe"
-            VALUE "ProductName", " SampleV 应用程序"
+            VALUE "ProductName", "SampleV 应用程序"
             VALUE "ProductVersion", "1, 0, 0, 1"
         END
     END

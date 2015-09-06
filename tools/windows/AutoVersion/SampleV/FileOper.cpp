@@ -72,8 +72,10 @@ ERR_EXIT:
 
 static int nCount = 0;
 
-#define DISCARD_FILE( fileName )\
-	if( _stricmp( data.cFileName, (fileName) ) == 0 ){PRINT_DEBUG_MSG( "特殊文件[%s]，忽略", (fileName) );continue;}
+//#define DISCARD_FILE( fileName )\
+//	if( _stricmp( data.cFileName, (fileName) ) == 0 ){PRINT_DEBUG_MSG( "特殊文件[%s]，忽略", (fileName) );continue;}
+
+#define DISCARD_FILE( fileName )
 
 void CheckRcFile( const char * rootPath, void (*lfn)( const std::string & ) )
 {
@@ -105,6 +107,7 @@ void CheckRcFile( const char * rootPath, void (*lfn)( const std::string & ) )
 		}
 
 		DISCARD_FILE( "zlib.rc" );
+		DISCARD_FILE( "zlib1.rc" );
 		DISCARD_FILE( "afxctl.rc" );
 		DISCARD_FILE( "afxdb.rc" );
 		DISCARD_FILE( "afxisapi.rc" );
@@ -117,9 +120,11 @@ void CheckRcFile( const char * rootPath, void (*lfn)( const std::string & ) )
 		DISCARD_FILE( "atl.rc" );
 		DISCARD_FILE( "atlres.rc" );
 		DISCARD_FILE( "atlsrv.rc" );
+		DISCARD_FILE( "libcurl.rc" );
+		DISCARD_FILE( "curl.rc" );
 
-
-		if( _stricmp( data.cFileName + strlen(data.cFileName) - 2, "rc" ) != 0 )		//根据文件扩展名来识别
+		//if( _stricmp( data.cFileName + strlen(data.cFileName) - 2, "rc" ) != 0 )		//根据文件扩展名来识别
+		if( _stricmp( data.cFileName, "versionno.rc2" ) != 0 )		//仅处理versionno.rc2文件
 			continue;
 
 		std::string filePath = rootPath;

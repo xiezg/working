@@ -27,11 +27,40 @@ std::string g_BackupPath;
 std::string g_VersionNum = "1.0.0.1";
 std::string g_ProductNum = "1.0.0.1";
 
+std::string g_VersionNumV2 = "1,0,0,1";
+std::string g_ProductNumV2 = "1,0,0,1";
+
+int g_Revision = 0;
+int g_Number = 0;
+
 HANDLE g_hLogFile = NULL;
 
 size_t findRcVersionSection( const std::string & fileContent )
 {
 	return fileContent.find( "VS_VERSION_INFO VERSIONINFO" ) == std::string::npos ? std::string::npos : std::string::npos + strlen( "VS_VERSION_INFO VERSIONINFO" );
+}
+
+std::string findAndReSetVersionSectionV2( std::string & fileContent, const std::string &secName, const std::string & newValue )
+{
+	PRE_FIND_VER_SEC( fileContent, "" );
+
+	size_t nPosBegin = std::string::npos;
+
+	if( ( nPosBegin = fileContent.find( secName, nPosWithVersionSection ) ) == std::string::npos )
+	{
+		PRINT_DEBUG_MSG( "Î´ÕÒµ½[%s]", secName.c_str() );
+		return "";
+	}
+
+	nPosBegin += secName.size();
+
+	size_t nPosEndLineNewLine = fileContent.find( "\r\n", nPosBegin );
+
+	std::string oldValue = fileContent.substr( nPosBegin, nPosEndLineNewLine - nPosBegin );
+
+	fileContent.replace( nPosBegin, nPosEndLineNewLine - nPosBegin, newValue );
+
+	return oldValue;
 }
 
 std::string findAndReSetVersionSection( std::string & fileContent, const std::string & secName, const std::string & newValue  )
@@ -108,6 +137,13 @@ void Update( const std::string & fileName )
 	PRINT_DEBUG_MSG( "[%s] [%s].", fileName.c_str(), oldValue.c_str() );
 
 	oldValue = findAndReSetProductVersion( rcFileContent, g_ProductNum );
+	PRINT_DEBUG_MSG( "[%s] [%s].", fileName.c_str(), oldValue.c_str() );
+
+	oldValue = findAndReSetVersionSectionV2( rcFileContent, "FILEVERSION ", g_VersionNumV2 );
+	PRINT_DEBUG_MSG( "[%s] [%s].", fileName.c_str(), oldValue.c_str() );
+
+	oldValue = findAndReSetVersionSectionV2( rcFileContent, "PRODUCTVERSION ", g_ProductNumV2 );
+	PRINT_DEBUG_MSG( "[%s] [%s].", fileName.c_str(), oldValue.c_str() );
 
 	BackupFile( fileName, g_BackupPath );
 	WriteFileFromMsg( fileName.c_str(), rcFileContent );
@@ -120,12 +156,27 @@ int _tmain(int argc, _TCHAR* argv[])
 	g_SearchPath = argv[1];
 	g_BackupPath = argv[2];
 
-	g_VersionNum = argv[3];
-	g_ProductNum = argv[4];
+	g_Revision = atoi( argv[3] );
 
 	g_hLogFile = OpenLogFile( NULL );
 
 	PRINT_DEBUG_MSG( "SearchPath:[%s].", g_SearchPath.c_str() );
+
+	char tmpbuf[1024] = {0};
+
+	time_t t = time( NULL );
+	struct tm* t2 = localtime( &t );
+	sprintf_s( tmpbuf, "%d.%0.2d.%0.2d.%d", t2->tm_year + 1900 , t2->tm_mon + 1, t2->tm_mday, g_Number  );
+	g_VersionNum = tmpbuf;
+	sprintf_s( tmpbuf, "%d,%0.2d,%0.2d,%d", t2->tm_year + 1900 , t2->tm_mon + 1, t2->tm_mday, g_Number  );
+	g_VersionNumV2 = tmpbuf;
+
+	memset( tmpbuf, 0, 1024 );
+
+	sprintf_s( tmpbuf, "1.0.%d.%d", g_Revision, g_Number  );
+	g_ProductNum = tmpbuf;
+	sprintf_s( tmpbuf, "1,0,%d,%d", g_Revision, g_Number  );
+	g_ProductNumV2 = tmpbuf;
 
 	CheckRcFile( g_SearchPath.c_str(), &Update );
 
