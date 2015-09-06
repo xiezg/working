@@ -7,6 +7,8 @@
 
 #include <Windows.h>
 
+typedef int (*lpTraverseFolderCallback)( LPCTSTR lpFilePath, LPCSTR lpFileName );
+
 void FormatFilePath( char * lpFilePath );
 
 void* _bzero( void * dest, size_t size );
@@ -18,5 +20,7 @@ bool WideCharToMultiByte( UINT CodePage, DWORD dwFlags, const std::wstring & Wid
 HMODULE GetLocalModuleHandle( BOOL IsProtected );
 
 ULONGLONG WINAPI Xiezg_InterlockedIncrement64( ULONGLONG volatile * Destination );
+
+int TraverseFolder( LPCTSTR lpPath, lpTraverseFolderCallback );
 
 #endif //TOOL_BOX_H

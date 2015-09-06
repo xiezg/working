@@ -3,6 +3,8 @@
 #include <assert.h>
 #include <string.h>
 
+#include <tchar.h>
+
 #include "auto_array.h"
 
 /*
@@ -228,4 +230,48 @@ retry:	add eax, 1
 	return retval;
 
 #endif //_WIN64
+}
+
+int TraverseFolder( LPCTSTR lpPath, lpTraverseFolderCallback callbackFn )
+{
+	WIN32_FIND_DATA ffd;
+	TCHAR szDir[MAX_PATH] = {0};
+	HANDLE hFind = INVALID_HANDLE_VALUE;
+
+	if( _tcsclen ( lpPath ) > ( MAX_PATH - 2 ) )
+		return -1;
+
+	_tcscpy_s( szDir, MAX_PATH, lpPath );
+	_tcscat_s( szDir, _T("\\*.*") );
+
+	if( INVALID_HANDLE_VALUE == ( hFind = FindFirstFile( szDir, &ffd ) ) ) 
+	{
+		return -1;
+	}
+
+	szDir[ _tcsclen( szDir ) - 3 ] = _T('\0');
+
+	do
+	{
+		_tcscat_s( szDir, ffd.cFileName );
+
+		if( ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
+		{
+			if( _tcscmp( ffd.cFileName, "." ) == 0 || _tcscmp( ffd.cFileName, ".." ) == 0 )
+				continue;
+
+			TraverseFolder( szDir, callbackFn );
+		}
+		else
+		{
+			callbackFn( szDir, ffd.cFileName );
+		}
+	}
+	while( szDir[ _tcsclen( szDir ) - _tcsclen( ffd.cFileName ) ] = _T('\0'), FindNextFile( hFind, &ffd ) );
+
+	int retval = ( GetLastError() == ERROR_NO_MORE_FILES ? 0 : -1 );
+
+	FindClose(hFind);
+
+	return retval;
 }

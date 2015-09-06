@@ -2,6 +2,7 @@
 //
 
 #include "stdafx.h"
+#include "ToolBox.h"
 
 #include "king/logmsg.h"
 
@@ -12,7 +13,7 @@ using namespace std;
 
 extern int WriteFileFromMsg( const char * fileName, const std::string & content );
 extern int MapFile( const char * fileName, std::string & fileContent );
-extern void CheckRcFile( const char * rootPath, void (*lfn)( const std::string & ) );
+extern void CheckRcFile( const char * rootPath, lpTraverseFolderCallback cb );
 extern void BackupFile( const std::string & fileSrc, const std::string & backup_dir );
 
 #define PRE_FIND_VER_SEC( FILE_CONTENT, ERR_RETVAL )\
@@ -123,32 +124,60 @@ std::string findAndReSetProductVersion( std::string & fileContent, const std::st
 	return findAndReSetVersionSection( fileContent, "ProductVersion", fileNewVersion );
 }
 
+//#define DISCARD_FILE( fileName )\
+//	if( _stricmp( data.cFileName, (fileName) ) == 0 ){PRINT_DEBUG_MSG( "特殊文件[%s]，忽略", (fileName) );continue;}
+
+#define DISCARD_FILE( fileName )
+
 std::string rcFileList;
 
-void Update( const std::string & fileName )
+int Update( LPCTSTR fileName, LPCSTR lpFileName )
 {
-	PRINT_DEBUG_MSG( "begin process -------[ %s ].", fileName.c_str() );
+	DISCARD_FILE( "zlib.rc" );
+	DISCARD_FILE( "zlib1.rc" );
+	DISCARD_FILE( "afxctl.rc" );
+	DISCARD_FILE( "afxdb.rc" );
+	DISCARD_FILE( "afxisapi.rc" );
+	DISCARD_FILE( "afxolecl.rc" );
+	DISCARD_FILE( "afxolesv.rc" );
+	DISCARD_FILE( "afxprint.rc" );
+	DISCARD_FILE( "afxres.rc" );
+	DISCARD_FILE( "all.rc" );
+	DISCARD_FILE( "app.rc" );
+	DISCARD_FILE( "atl.rc" );
+	DISCARD_FILE( "atlres.rc" );
+	DISCARD_FILE( "atlsrv.rc" );
+	DISCARD_FILE( "libcurl.rc" );
+	DISCARD_FILE( "curl.rc" );
+
+	//if( _stricmp( data.cFileName + strlen(data.cFileName) - 2, "rc" ) != 0 )		//根据文件扩展名来识别
+	if( _stricmp( fileName, "versionno.rc2" ) != 0 )		//仅处理versionno.rc2文件
+		return 0;
+
+	PRINT_DEBUG_MSG( "begin process -------[ %s ].", fileName );
 
 	std::string rcFileContent;
 
-	MapFile( fileName.c_str(), rcFileContent );
+	MapFile( fileName, rcFileContent );
 
 	std::string oldValue = findAndReSetFileVersion( rcFileContent, g_VersionNum );
-	PRINT_DEBUG_MSG( "[%s] [%s].", fileName.c_str(), oldValue.c_str() );
+	PRINT_DEBUG_MSG( "[%s] [%s].", fileName, oldValue.c_str() );
 
 	oldValue = findAndReSetProductVersion( rcFileContent, g_ProductNum );
-	PRINT_DEBUG_MSG( "[%s] [%s].", fileName.c_str(), oldValue.c_str() );
+	PRINT_DEBUG_MSG( "[%s] [%s].", fileName, oldValue.c_str() );
 
 	oldValue = findAndReSetVersionSectionV2( rcFileContent, "FILEVERSION ", g_VersionNumV2 );
-	PRINT_DEBUG_MSG( "[%s] [%s].", fileName.c_str(), oldValue.c_str() );
+	PRINT_DEBUG_MSG( "[%s] [%s].", fileName, oldValue.c_str() );
 
 	oldValue = findAndReSetVersionSectionV2( rcFileContent, "PRODUCTVERSION ", g_ProductNumV2 );
-	PRINT_DEBUG_MSG( "[%s] [%s].", fileName.c_str(), oldValue.c_str() );
+	PRINT_DEBUG_MSG( "[%s] [%s].", fileName, oldValue.c_str() );
 
 	BackupFile( fileName, g_BackupPath );
-	WriteFileFromMsg( fileName.c_str(), rcFileContent );
+	WriteFileFromMsg( fileName, rcFileContent );
 
-	PRINT_DEBUG_MSG( "end process -------[ %s ].", fileName.c_str() );
+	PRINT_DEBUG_MSG( "end process -------[ %s ].", fileName );
+
+	return 0;
 }
 
 int _tmain(int argc, _TCHAR* argv[])
@@ -165,10 +194,12 @@ int _tmain(int argc, _TCHAR* argv[])
 	char tmpbuf[1024] = {0};
 
 	time_t t = time( NULL );
-	struct tm* t2 = localtime( &t );
-	sprintf_s( tmpbuf, "%d.%0.2d.%0.2d.%d", t2->tm_year + 1900 , t2->tm_mon + 1, t2->tm_mday, g_Number  );
+	struct tm t2;
+	localtime_s( &t2, &t );
+
+	sprintf_s( tmpbuf, "%d.%0.2d.%0.2d.%d", t2.tm_year + 1900 , t2.tm_mon + 1, t2.tm_mday, g_Number  );
 	g_VersionNum = tmpbuf;
-	sprintf_s( tmpbuf, "%d,%0.2d,%0.2d,%d", t2->tm_year + 1900 , t2->tm_mon + 1, t2->tm_mday, g_Number  );
+	sprintf_s( tmpbuf, "%d,%0.2d,%0.2d,%d", t2.tm_year + 1900 , t2.tm_mon + 1, t2.tm_mday, g_Number  );
 	g_VersionNumV2 = tmpbuf;
 
 	memset( tmpbuf, 0, 1024 );
