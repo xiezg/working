@@ -7,7 +7,7 @@
 
 #include <Windows.h>
 
-typedef int (*lpTraverseFolderCallback)( LPCTSTR lpFilePath, LPCSTR lpFileName );
+typedef int (*lpTraverseFolderCallback)( LPCTSTR lpFilePath, LPCSTR lpFileName, void * ctx );
 
 void FormatFilePath( char * lpFilePath );
 
@@ -21,6 +21,6 @@ HMODULE GetLocalModuleHandle( BOOL IsProtected );
 
 ULONGLONG WINAPI Xiezg_InterlockedIncrement64( ULONGLONG volatile * Destination );
 
-int TraverseFolder( LPCTSTR lpPath, lpTraverseFolderCallback );
+int TraverseFolder( LPCTSTR lpPath, lpTraverseFolderCallback, void * );
 
 #endif //TOOL_BOX_H

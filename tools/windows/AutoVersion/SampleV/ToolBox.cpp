@@ -232,7 +232,7 @@ retry:	add eax, 1
 #endif //_WIN64
 }
 
-int TraverseFolder( LPCTSTR lpPath, lpTraverseFolderCallback callbackFn )
+int TraverseFolder( LPCTSTR lpPath, lpTraverseFolderCallback callbackFn, void * ctx )
 {
 	WIN32_FIND_DATA ffd;
 	TCHAR szDir[MAX_PATH] = {0};
@@ -260,11 +260,11 @@ int TraverseFolder( LPCTSTR lpPath, lpTraverseFolderCallback callbackFn )
 			if( _tcscmp( ffd.cFileName, "." ) == 0 || _tcscmp( ffd.cFileName, ".." ) == 0 )
 				continue;
 
-			TraverseFolder( szDir, callbackFn );
+			TraverseFolder( szDir, callbackFn, ctx );
 		}
 		else
 		{
-			callbackFn( szDir, ffd.cFileName );
+			callbackFn( szDir, ffd.cFileName, ctx );
 		}
 	}
 	while( szDir[ _tcsclen( szDir ) - _tcsclen( ffd.cFileName ) ] = _T('\0'), FindNextFile( hFind, &ffd ) );

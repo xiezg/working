@@ -131,7 +131,7 @@ std::string findAndReSetProductVersion( std::string & fileContent, const std::st
 
 std::string rcFileList;
 
-int Update( LPCTSTR fileName, LPCSTR lpFileName )
+int Update( LPCTSTR fileName, LPCSTR lpFileName, void *  )
 {
 	DISCARD_FILE( "zlib.rc" );
 	DISCARD_FILE( "zlib1.rc" );

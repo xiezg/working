@@ -74,11 +74,13 @@ int FastViewerFileVersinInfo( const _TCHAR * fileName )
 	return 0;
 }
 
-int TraverseFolderCb( LPCTSTR filePath, LPCTSTR fileName )
+int TraverseFolderCb( LPCTSTR filePath, LPCTSTR fileName, void * ctx )
 {
+	int * scanType = (int*)ctx;
+
 	LPCSTR lpFileExe = PathFindExtension( filePath );
 
-	if( _tcscmp( lpFileExe, _T(".exe") ) != 0 && _tcscmp( lpFileExe, _T(".sys") ) != 0 && _tcscmp( lpFileExe, _T(".dll") ) != 0 )
+	if( _tcscmp( lpFileExe, _T(".exe") ) != 0 && _tcscmp( lpFileExe, _T(".dll") ) != 0 && _tcscmp( lpFileExe, _T(".sys") ) != 0 )
 		return 0;
 
 	std::string fileVersion, fileProductVersion;
@@ -86,13 +88,24 @@ int TraverseFolderCb( LPCTSTR filePath, LPCTSTR fileName )
 	if( QueryFileVersionInfo( filePath, fileVersion, fileProductVersion ) == -1 )
 		return 0;
 
-	if( fileVersion == g_expectFileVersion && fileProductVersion == g_expectFileProductVersion )
+	if( *scanType == 0 && fileVersion == g_expectFileVersion && fileProductVersion == g_expectFileProductVersion )
+	{
+		PRINT_DEBUG_MSG( _T("[%s][%s][%s]"), filePath, fileVersion.c_str(), fileProductVersion.c_str() );
+	}
+	else if( *scanType != 0 && ( fileVersion != g_expectFileVersion || fileProductVersion != g_expectFileProductVersion ) )
 	{
 		PRINT_DEBUG_MSG( _T("[%s][%s][%s]"), filePath, fileVersion.c_str(), fileProductVersion.c_str() );
 	}
 
 	return 0;
 }
+
+/*----------------------------------------------------------------------------------------------------------------------------------------------------
+/v 
+	快速查看版本号
+/c|nc 1.1.1.1 1,1,1,1 ScanPath
+	扫描ScanPath下所有的 exe ,dll ,sys文件版本号和产品版本号是否和给定的一样(或不一样)（1.1.1.1 预期的文件版本号，1,1,1,1 预期的产品版本号）
+-----------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 int _tmain(int argc, _TCHAR* argv[])
 {
@@ -101,13 +114,16 @@ int _tmain(int argc, _TCHAR* argv[])
 	if( _tcsicmp( argv[1], _T("/v") ) == 0 )
 		return FastViewerFileVersinInfo( argv[2] );
 
-	if( _tcsicmp( argv[1], _T("/c") ) == 0 )
+	int scanType = -1;
+	int scanType2 = -1;
+
+	if( ( scanType = _tcsicmp( argv[1], _T("/c") ) ) == 0 || ( scanType2 = _tcsicmp( argv[1], _T("/nc") ) ) == 0 )
 	{
 		g_expectFileVersion = argv[2];
 		g_expectFileProductVersion  = argv[3];
 		std::string searchFilePath = argv[4];
 
-		TraverseFolder( argv[4], TraverseFolderCb );
+		TraverseFolder( argv[4], TraverseFolderCb, &scanType );
 
 		return 0;
 	}

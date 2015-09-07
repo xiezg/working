@@ -76,7 +76,7 @@ static int nCount = 0;
 
 void CheckRcFile( const char * rootPath, lpTraverseFolderCallback cb )
 {
-	TraverseFolder( rootPath, cb );
+	TraverseFolder( rootPath, cb, NULL );
 }
 
 void BackupFile( const std::string & fileSrc, const std::string & backup_dir )
