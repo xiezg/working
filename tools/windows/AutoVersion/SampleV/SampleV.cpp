@@ -32,7 +32,7 @@ std::string g_VersionNumV2 = "1,0,0,1";
 std::string g_ProductNumV2 = "1,0,0,1";
 
 int g_Revision = 0;
-int g_Number = 0;
+DWORD g_Number = 0;
 
 HANDLE g_hLogFile = NULL;
 
@@ -196,6 +196,9 @@ int _tmain(int argc, _TCHAR* argv[])
 	time_t t = time( NULL );
 	struct tm t2;
 	localtime_s( &t2, &t );
+
+	g_Number = static_cast<DWORD>( t );
+	g_Number %= 100000;
 
 	sprintf_s( tmpbuf, "%d.%0.2d.%0.2d.%d", t2.tm_year + 1900 , t2.tm_mon + 1, t2.tm_mday, g_Number  );
 	g_VersionNum = tmpbuf;
