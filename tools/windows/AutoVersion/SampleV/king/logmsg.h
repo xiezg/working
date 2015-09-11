@@ -119,7 +119,7 @@ extern HANDLE g_hLogFile;
 	GetLocalTime ( &sysTm );\
 	TCHAR tmMsg[64] = {0};\
 	_stprintf_s( tmMsg, 64, _T("%d-%0.2d-%0.2d %0.2d:%0.2d:%0.2d.%0.3d"), sysTm.wYear, sysTm.wMonth, sysTm.wDay, sysTm.wHour, sysTm.wMinute, sysTm.wSecond, sysTm.wMilliseconds );\
-	WriteLogMsg( HLOG _T("%s  [0x%0.4x]  %s    ")##MSG##_T("\r\n"), tmMsg,  ::GetCurrentThreadId(), _T_FUNCTION__, __VA_ARGS__ );\
+	WriteLogMsg( HLOG _T("%s  [0x%0.4x]  %s    ")##_T(MSG)##_T("\r\n"), tmMsg,  ::GetCurrentThreadId(), _T_FUNCTION__, __VA_ARGS__ );\
 	}
 
 #endif //__LOG_MESSAGE_H__
