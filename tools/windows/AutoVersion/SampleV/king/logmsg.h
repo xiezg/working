@@ -8,6 +8,7 @@
 #include <yvals.h >
 #include <direct.h>
 #include <stdio.h>
+#include <conio.h> 
 
 #include ".\Lock.h"
 

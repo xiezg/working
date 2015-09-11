@@ -131,7 +131,7 @@ std::string findAndReSetProductVersion( std::string & fileContent, const std::st
 
 std::string rcFileList;
 
-int Update( LPCTSTR fileName, LPCSTR lpFileName, void *  )
+int Update( LPCTSTR filePath, LPCSTR fileName, void *  )
 {
 	DISCARD_FILE( "zlib.rc" );
 	DISCARD_FILE( "zlib1.rc" );
@@ -154,28 +154,28 @@ int Update( LPCTSTR fileName, LPCSTR lpFileName, void *  )
 	if( _stricmp( fileName, "versionno.rc2" ) != 0 )		//仅处理versionno.rc2文件
 		return 0;
 
-	PRINT_DEBUG_MSG( "begin process -------[ %s ].", fileName );
+	PRINT_DEBUG_MSG( "begin process -------[ %s ].", filePath );
 
 	std::string rcFileContent;
 
-	MapFile( fileName, rcFileContent );
+	MapFile( filePath, rcFileContent );
 
 	std::string oldValue = findAndReSetFileVersion( rcFileContent, g_VersionNum );
-	PRINT_DEBUG_MSG( "[%s] [%s].", fileName, oldValue.c_str() );
+	PRINT_DEBUG_MSG( "[%s] [%s].", filePath, oldValue.c_str() );
 
 	oldValue = findAndReSetProductVersion( rcFileContent, g_ProductNum );
-	PRINT_DEBUG_MSG( "[%s] [%s].", fileName, oldValue.c_str() );
+	PRINT_DEBUG_MSG( "[%s] [%s].", filePath, oldValue.c_str() );
 
 	oldValue = findAndReSetVersionSectionV2( rcFileContent, "FILEVERSION ", g_VersionNumV2 );
-	PRINT_DEBUG_MSG( "[%s] [%s].", fileName, oldValue.c_str() );
+	PRINT_DEBUG_MSG( "[%s] [%s].", filePath, oldValue.c_str() );
 
 	oldValue = findAndReSetVersionSectionV2( rcFileContent, "PRODUCTVERSION ", g_ProductNumV2 );
-	PRINT_DEBUG_MSG( "[%s] [%s].", fileName, oldValue.c_str() );
+	PRINT_DEBUG_MSG( "[%s] [%s].", filePath, oldValue.c_str() );
 
-	BackupFile( fileName, g_BackupPath );
-	WriteFileFromMsg( fileName, rcFileContent );
+	BackupFile( filePath, g_BackupPath );
+	WriteFileFromMsg( filePath, rcFileContent );
 
-	PRINT_DEBUG_MSG( "end process -------[ %s ].", fileName );
+	PRINT_DEBUG_MSG( "end process -------[ %s ].", filePath );
 
 	return 0;
 }
