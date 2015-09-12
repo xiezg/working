@@ -185,8 +185,6 @@ int _tmain(int argc, _TCHAR* argv[])
 	g_SearchPath = argv[1];
 	g_BackupPath = argv[2];
 
-	wprintf(L"Warning" L"divider == 0" L"/n");
-
 	g_Revision = atoi( argv[3] );
 
 	g_hLogFile = OpenLogFile( NULL );

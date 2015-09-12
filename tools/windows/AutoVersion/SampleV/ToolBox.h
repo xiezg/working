@@ -7,7 +7,7 @@
 
 #include <Windows.h>
 
-typedef int (*lpTraverseFolderCallback)( LPCTSTR lpFilePath, LPCSTR lpFileName, void * ctx );
+typedef int (*lpTraverseFolderCallback)( LPCTSTR lpFilePath, LPCTSTR lpFileName, void * ctx );
 
 void FormatFilePath( char * lpFilePath );
 

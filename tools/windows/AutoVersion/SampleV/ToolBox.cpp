@@ -257,7 +257,7 @@ int TraverseFolder( LPCTSTR lpPath, lpTraverseFolderCallback callbackFn, void * 
 
 		if( ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
 		{
-			if( _tcscmp( ffd.cFileName, "." ) == 0 || _tcscmp( ffd.cFileName, ".." ) == 0 )
+			if( _tcscmp( ffd.cFileName, _T(".") ) == 0 || _tcscmp( ffd.cFileName, _T("..") ) == 0 )
 				continue;
 
 			TraverseFolder( szDir, callbackFn, ctx );
