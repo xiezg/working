@@ -77,6 +77,8 @@ static void WriteLogMsgA( HANDLE hLogFile, const char * lpMsg, ... )
 
 	DWORD dwWriteBytes = 0;
 	::WriteFile( hLogFile, msgBuf, static_cast<DWORD>( strlen( msgBuf ) ), &dwWriteBytes, NULL );
+
+	FlushFileBuffers( hLogFile );
 }
 
 static void WriteLogMsgW( HANDLE hLogFile, const wchar_t * lpMsg, ... )
@@ -98,6 +100,8 @@ static void WriteLogMsgW( HANDLE hLogFile, const wchar_t * lpMsg, ... )
 
 	DWORD dwWriteBytes = 0;
 	::WriteFile( hLogFile, msgBufANSI, static_cast<DWORD>( strlen( msgBufANSI ) ), &dwWriteBytes, NULL );
+
+	FlushFileBuffers( hLogFile );
 }
 
 #ifdef RELEASE_DEBUG
